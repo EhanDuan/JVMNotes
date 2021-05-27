@@ -1,0 +1,21 @@
+Notes About JVM(Java Virtual Machine)
+=====
+Introdution to JMM(Java Memory Model)
+-----
+GC(Garbage Collection) and Memory Strategy
+-----
+# Review
+"There is a high 'wall' made of dynamic memory allocation and skills of garbage collection between Java and C++. People inside wanna step outside. People outside wanna jump into it." This is a sentence from the Chinese book of understanding Java Virtual Machine. I like it.
+
+Just let us out of this cyber-punk. When talking about garbage, if you are responsible for your garage in your house, how do you deal with it? Left for your mom? That might be a "good" strategy. But if you are alone, what should you start from? 
+(1) Find what stuff belongs to garbage; 
+(2) Think When you should collect them;(Think about how your LOL teammate will kill you if you clean your room during the ranking :))
+(3) Figure out how to collect your garbage;
+
+Why should we learn the mechanism of the garage collection and memory dynamic allocation even JVM has taken charge of it? 
+Very easy to answer. 
+(1) GC PART : If you mom cleans your room regularly in her pattern, imaging you play WOW for a very long time in front of your gameing computer. If she keeps going into your room and clean your stuff even cleaning the dust on your keyboard, do you think you can beat the boss successfully? Especially when if you and your brothers play the games in your room, will you enjoy the time when the room is cleaning at the same time? The way to solve it is to talking with your mom to clean after your playing or you stop the battle for a while.
+(2) Momery Dynamic Allocation PART: Image your mom is responsible for your stuff storing. Everytime you buy some toys or posters, she needs to arrange them in a good order. One day, you take an elephant back to home, you mom says "oh gosh, we do not have enough room to keep it." You need to find out why and how to solve it by yourself.
+[acedemic version]
+When there is StackOverFlowError or Momeny Leak Issue, JVM cannot help you. You need to solve the problems.
+Also, when using the c
