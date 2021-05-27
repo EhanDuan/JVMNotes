@@ -1,4 +1,4 @@
-Notes About JVM
+Notes About JVM(Java Virtual Machine)
 =====
-Introdution to JMM
+Introdution to JMM(Java Memory Model)
 -----
