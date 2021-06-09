@@ -33,3 +33,14 @@ Very easy to answer.
 [acedemic version]
 When there is StackOverFlowError or Momeny Leak Issue, JVM cannot help you. You need to solve the problems.
 
+# GC Algorithms
+## Mark-Sweep
+It was proposed by John McCarthy in 1960. It has two phrases just like its name: mark and sweep. Mark the objects which need to be recycled and after all marks, clean these objects, which is sweep. Vice Versa(i.e. mark survivor and sweep unmarked ones)
+
+This is the most fundamental algorithm since the new-coming algorithms are developed based on this one. 
+![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20GC%20Algorithms%20-MS.svg)
+
+## Mark-Copy
+In 1969, Semispace Copying was proposed by Fenichel. It seperates the memory into 2 equal-size parts. Each time, only one of these two is used. Only when current one is depleted, the survivor in this memory will be copied to another memory. Then the previous memory will be cleaned at once.
+![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20Garbage%20Collection%20Algorithms%20MC.svg)
+
