@@ -11,7 +11,7 @@ Dive deeper for Stacks
 Let's go to the Heap
 ![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20Heap%20(View%20of%20Generation).png)
 
-Some confusing part about Method Area and Heap Relationship during different editions
+Some confusing part about Method Area and Heap relationships during different editions
 ![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20Heap%20and%20Method%20Area%20Developing.png)
 
 
