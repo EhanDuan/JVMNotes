@@ -2,6 +2,12 @@ Notes About JVM(Java Virtual Machine)
 =====
 Introdution to JMM(Java Memory Model)
 -----
+![image](https://github.com/EhanDuan/Java/blob/main/Img/Java%20JVM%20Run-Time%20Data%20Areas.png)
+
+
+
+
+
 GC(Garbage Collection) and Memory Strategy
 -----
 # Review
@@ -18,4 +24,4 @@ Very easy to answer.
 (2) Momery Dynamic Allocation PART: Image your mom is responsible for your stuff storing. Everytime you buy some toys or posters, she needs to arrange them in a good order. One day, you take an elephant back to home, you mom says "oh gosh, we do not have enough room to keep it." You need to find out why and how to solve it by yourself.
 [acedemic version]
 When there is StackOverFlowError or Momeny Leak Issue, JVM cannot help you. You need to solve the problems.
-Also, when using the c
+
