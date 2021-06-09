@@ -2,9 +2,17 @@ Notes About JVM(Java Virtual Machine)
 =====
 Introdution to JMM(Java Memory Model)
 -----
+Typically, start from the Run-time Data Areas
 ![image](https://github.com/EhanDuan/Java/blob/main/Img/Java%20JVM%20Run-Time%20Data%20Areas.png)
 
+Dive deeper for Stacks
+![image](https://github.com/EhanDuan/Java/blob/main/Img/Java%20JVM%20Stack.png)
 
+Let's go to the Heap
+![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20Heap%20(View%20of%20Generation).png)
+
+Some confusing part about Method Area and Heap Relationship during different editions
+![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20Heap%20and%20Method%20Area%20Developing.png)
 
 
 
