@@ -3,7 +3,7 @@ Notes About JVM(Java Virtual Machine)
 Introdution to JMM(Java Memory Model)
 -----
 Typically, start from the Run-time Data Areas
-![image](https://github.com/EhanDuan/Java/blob/main/Img/Java%20JVM%20Run-Time%20Data%20Areas.png)
+![image](https://github.com/EhanDuan/Java/blob/main/Img/Java%20JVM%20Run-Time%20Data%20Areas.svg)
 
 Dive deeper for Stacks
 ![image](https://github.com/EhanDuan/Java/blob/main/Img/Java%20JVM%20Stack.png)
