@@ -2,8 +2,11 @@ Notes About JVM(Java Virtual Machine)
 =====
 Under the Hood JMM(Java Memory Model)
 -----
-* [Run-time Data Areas](#run-time data areas)
-
+* [Run-time Data Areas](#run-time-data-areas)
+* [Stack](#stack)
+* [Heap](#heap)
+* [Method Areas and Heap relationships during different editions](#method-areas-and-heap-relationships-during-different-editions)
+* [Class Constant Pool? String Pool? StringTable? Run-time Constant Pool?](#constants)
 # Run-time Data Areas
 Typically, start from the Run-time Data Areas
 ![image](https://github.com/EhanDuan/Java/blob/main/Img/Java%20JVM%20Run-Time%20Data%20Areas.svg)
@@ -17,7 +20,7 @@ Typically, start from the Run-time Data Areas
 ## Some Confusing Parts Explanation
 ### Method Areas and Heap relationships during different editions
 ![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20Heap%20and%20Method%20Area%20Developing.svg)
-### Class Constant Pool? String Pool? StringTable? Run-time Constant Pool? 
+### Constants 
 #### String Pool (String literal Pool)
 This is after `class loading` and `verification` and `preparation`, the String instance objects are created in the heap. The references of these string instance objects are stored in string pool. (In Hotspot, the function of string pool is realized by String Table, which is a hash table, which stores the string interning). 
 
@@ -80,6 +83,7 @@ In 1974, Edward Lueders proposed "Mark-Compact" algorithm. Basically, it is the 
 ![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20GC%20Mark-Compact.svg)
 
 # GC Realizations
+Talk about HopSpot.
 ## Enum the GC Root
 There are two ways to determine objects to "die" or not : `Reference Counting GC` and `Tracing GC`. Most of the JVMs use the second one. The idea is to 
 (1) Firstly, find the gc root;
@@ -119,5 +123,33 @@ For voluntary Suspension: When gc happens, system will not directly act on the t
 
 
 ## Safe Region
+`Safe region` is used to deal with the situations when some threads are not in "processing", like `Sleep` state or `Blocked` state. In this case, these threads cannot response to the stop request from the JVM. JVM cannot also wait these threads to be activated.
+
+Safe region is the expanding safe point. In the safe region, the reference links are not going to change. So in this case, any place here is safe to start gc.
+
+When the threads reach the safe regions, they will mark themselves to show they are here. 
+(1)When in this time, JVM wants to start gc, JVM will not need to consider these marked threads.
+(2)When these threads are going to leave the region, check if gc roots enum has finished or not. If so, threads keep running. If not, threads wait until gc roots enum finish.
+
+
 ## Remembered Set
+Remembered Set is abstract data structure realized by `CardTable` implementation. It is used to deal with inter-gen reference situation which means some objects in `Gen A` links to objects on `Gen B` or other gens. It can avoid to enum gc roots in all Tenured(Old) Gen which is INDEED heavy work.
+
+There are three accuracy:
+* Word Accuracy: Every record is accurate to each word(i.e. address bits of the processor, 32 or 64.), which includes inter-gen pointers;
+* Object Accuracy: Every record is accurate to each object, which has fields which owns inter-gen pointers;
+* Card Accuracy: Every record is accuate to a certain memory region, where there are objects have inter-gen pointers;
+
+For `CardTable`, it uses the card accuracy. The most simple form of `CardTable` is a byte array, which is adopted by HotSpot. Each element in the array corresponds to a specific memory block in its marked-memory-region. The memory block is called `Card Page`.
+
+There is not only one object in the memory of a card page. If there is one or more objects which has the inter-gen pointers, these elements will mark as "1", which could call these elements "dirty". No inter-gen pointers will mark "0". When gc starts, it only needs to select the "dirty" elements. So it knows which card pages have inter-gen pointers and add them into gc roots to scan.
+
+## Write Barrier
+Thoertically, when the objects in a card page needs to be assigned, it should be mark "1". In HotSpot, `Write Barrier` is used to maintain the state of the `CardTable`. Write barrier can be viewed as the AOP`aspect` of this action when JVM faces this assignment action.  When objects are being assigned, a around notice is generated which allows extra actions. In this case, there are two barries : `Pre-Write Barrier`,`Post-write Barrier`. After applying this, JVM will generate instructions for all assignment commands. 
+
+ Another Problem: False Sharing. 
+
+ 
+
+## Concurrent Reachability Analysis
 
