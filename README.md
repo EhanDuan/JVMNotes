@@ -1,6 +1,6 @@
 Notes About JVM(Java Virtual Machine)
 =====
-Introdution to JMM(Java Memory Model)
+Under the Hood JMM(Java Memory Model)
 -----
 # Run-time Data Areas
 Typically, start from the Run-time Data Areas
@@ -14,7 +14,7 @@ Typically, start from the Run-time Data Areas
 
 ## Some Confusing Parts Explanation
 ### Method Areas and Heap relationships during different editions
-![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20Heap%20and%20Method%20Area%20Developing.png)
+![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20Heap%20and%20Method%20Area%20Developing.svg)
 ### Class Constant Pool? String Pool? StringTable? Run-time Constant Pool? 
 #### String Pool (String literal Pool)
 This is after `class loading` and `verification` and `preparation`, the String instance objects are created in the heap. The references of these string instance objects are stored in string pool. (In Hotspot, the function of string pool is realized by String Table, which is a hash table, which stores the string interning). 
@@ -79,6 +79,43 @@ In 1974, Edward Lueders proposed "Mark-Compact" algorithm. Basically, it is the 
 
 # GC Realizations
 ## Enum the GC Root
+There are two ways to determine objects to "die" or not : `Reference Counting GC` and `Tracing GC`. Most of the JVMs use the second one. The idea is to 
+(1) Firstly, find the gc root;
+(2) Trace the objects based on the root; (Reachability)
+(3) The objects which could be traced by the roots can survive. Others memory space will be recyled.
+
+![image](https://github.com/EhanDuan/Java/blob/main/Img/JVM%20GC%20Roots.svg)
+So it is crucial to enum the gc root correctly.
+
+The objects which are usually gc roots:
+(1) Constant (eg. StringTable)
+(2) Class static field and variables
+(3) Execution context (eg. local variables in the stack frame)
+(4) Sychronized objects
+(5) JNI handles
+
+Enum gc roots needs `Stop the World`. If the threads continue running, the link relationship bewteen gc roots and other objects could change.
+
+The data structure `OopMap` is adpoted to solved the heavy work to find the gc roots in the HotSpot. Once the `class loading` is done, the information about which type data is stored in which offset in the objects. In the JNI, the location of references in the stack and PC register will be stored. In this case, the collector will know these information during scanning instead of finding one by one from gc roots.
+
+Reference:https://xie.infoq.cn/article/ba113294bb20a41614502a063
+
 ## Safe Point
+If each `OopMap` instance is created for each command, large extra store space is needed. This price is expensive.
+
+In this case, not every command will have an OopMap. Only reaching `Safepoint`, the information is stored. It means the program needs to run to these locations and then stop and gc. 
+
+Safe points usually appear in long-time command, for example, method call, loop jumping(`break`, `continue`, `return`), excepting jumping and other kinds of instructions reuse.
+
+Two ways for letting threads to stop at certain regions:
+* Preemptive Suspension
+* Voluntary Suspension
+
+For Preemptive Suspension: When gc happens, system will stop all the user threads. Check if some threads are at safe point or not. If not, let the corresponding threads run a while and then stop them to check iteratively. Almost no JVMs uses this.
+
+For voluntary Suspension: When gc happens, system will not directly act on the threads. Instead, threads always `poll` "safe point flag" during the execution at reasonable intervals. When finding the "stop signs" are true, threads will stop at the neareat safe points.
+
+
 ## Safe Region
+## Remembered Set
 
