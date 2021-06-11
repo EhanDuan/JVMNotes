@@ -148,8 +148,41 @@ There is not only one object in the memory of a card page. If there is one or mo
 Thoertically, when the objects in a card page needs to be assigned, it should be mark "1". In HotSpot, `Write Barrier` is used to maintain the state of the `CardTable`. Write barrier can be viewed as the AOP`aspect` of this action when JVM faces this assignment action.  When objects are being assigned, a around notice is generated which allows extra actions. In this case, there are two barries : `Pre-Write Barrier`,`Post-write Barrier`. After applying this, JVM will generate instructions for all assignment commands. 
 
  Another Problem: False Sharing. 
+The cpu cache system uses `Cache Line` as store unit. When more than one threads update their mutually stand-alone varibles, which are in the same cache line, the efficiency will decrease.
 
- 
+The solution is not to use unconditional write barrier. Check the card table marks firstly. Only clean element can be marked "dirty".
 
 ## Concurrent Reachability Analysis
 
+Tracing objects from GC roots requires more stop duration when Java Heap memory increases. Bigger heap is, more objects are, more complicated the graph is. `Mark` is the common characteristic for all tracing gc algorithms. So if `Mark` is optimized, the benefit is huge. Before that, let's introduce a new concept "Tri-color Marking".
+
+Tri-color Marking is a tool to better understand the objects which differ in "gc access" state.
+
+* White: objects which have not been accesssed by the garbage collector. Obviously, at starting point, all objects are white. At the end, the white objects mean they are not reachable.
+* Black: object which has been accessed by the garbage collector and all the references of the object have been scanned. Black objects mean they are safe. If some object refers to black objects, no need to re-scan.(Reference has direction) Black objects cannot directly link to some white object without passing grey objects.
+* Grey: object which has been accessed by teh garbage collector but there is at lease one reference of this object has not been scanned.
+
+Imagine that, the process of the gc root tracing is like the wave in the sea. The wave crest is grey, white is in the front of grey, black is behind.
+
+Let's back to the problem. If the collector and user threads work together, there would be two results:  
+(1) "safe" -> "Die"  
+(2) "Die" -> "Safe"   
+The second one is not serious, which stays more garbage in the memory. But the first one could destroy useful links in the user threads.
+
+1. Starting Point
+2a. Scan
+3a. Scan Finishing
+
+But the following could happen concurrently
+2b. Scan (Reference Change)
+2C. Scan (Reference Change)
+
+The key point of the problem is object disappearance(i.e. "black" -> "white"). It happens if and only if the 2 following situations are met at the same time:  
+(1) More new references from black to white are created;  
+(2) For a certain white object, all direct or indirect references from grey to that white are cut.
+
+The solution aims the aforementioned two conditions:  
+(1) Incremental Update;  
+(2) Snapshot At The Beginning, SATB;  
+
+Reference: https://en.wikipedia.org/wiki/Tracing_garbage_collection#Tri-color_marking
